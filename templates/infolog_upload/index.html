@@ -1,0 +1,62 @@
+{% extends 'srs_base.html' %}
+{% load eztables %}
+
+{% comment %}
+<!-- 
+Please see srs_base.html for license information.
+-->
+{% endcomment %}
+
+{% block page_css %}
+{% endblock %}
+
+
+{% block pagetitle %}Browse Infologs{% endblock %}
+
+{% block maincontent %}
+      <div class="row">
+        <div class="col-xs-12">
+          <h1 class="page-header">Browse Infologs</h1>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12 col-sm-offset-1 col-sm-10">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Match Date</th>
+                  <th>Upload Date</th>
+                  <th>Game</th>
+                  <th>Engine</th>
+                  <th>Severity</th>
+                  <th>Uploader</th>
+                  <th>Replay</th>
+                  <th>Comments</th>
+                </tr>
+              </thead>
+              <tbody>
+{% for infolog in infologs %}
+                <tr>
+                  <td><a href="{{ infolog.get_absolute_url }}"># {{ infolog.id }}</a></td>
+                  <td>{{ infolog.replay.unixTime|date:"SHORT_DATE_FORMAT" }}</td>
+                  <td>{{ infolog.upload_date|date:"SHORT_DATE_FORMAT" }}</td>
+                  <td>{{ infolog.game }}</td>
+                  <td>{{ infolog.replay.versionString }}</td>
+                  <td>Todo</td>
+                  <td><a href="{{ infolog.uploader.get_absolute_url }}">{{ infolog.uploader.username }}</a></td>
+                  <td><a href="{{ infolog.replay.get_absolute_url }}">{{ infolog.replay.title }}</a></td>
+                  <td>Todo</td>
+                </tr>
+{% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+{% endblock %}
+
+{% block page_js %}
+{% endblock %}

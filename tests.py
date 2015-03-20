@@ -9,5 +9,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django import test
-from django import forms
 
+from jsonrpc.proxy import ServiceProxy
+
+from test_logins import *
+
+
+class TestInfologUpload(test.TestCase):
+    # fixtures = []
+
+    def test_authenticate_with_InfologUpload_success(self):
+        sp = ServiceProxy(test_url)
+        out = sp.upload(lobby_username, lobby_password, "infolog text blah blah", "client name", "some free text",
+                        False, {})
+        self.assertIsNone(out["error"])
+        self.assertEqual(out["result"]["status"], 0)

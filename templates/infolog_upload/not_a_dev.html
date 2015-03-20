@@ -1,0 +1,16 @@
+{% extends 'srs_base.html' %}
+
+{% comment %}
+<!-- 
+Please see srs_base.html for license information.
+-->
+{% endcomment %}
+
+{% block pagetitle %}Not allowed{% endblock %}
+
+{% block maincontent%}
+
+<p>To use this page, you must <a href="{% url "srs.views.login" %}?next={{ selfurl }}">login</a> as a developer or as
+    user {{ replay.uploader }}.</p>
+
+{% endblock %}
