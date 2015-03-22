@@ -112,15 +112,20 @@ def upload(request, infolog, client, freetext, has_support_ticket, extensions):
     return {"status": 0, "id": int(il.id), "msg": "Success.", "url": il.get_absolute_url()}
 
 
+@login_required
 def infolog_view(request, infologid):
     c = all_page_infos(request)
     infolog = get_object_or_404(Infolog, id=infologid)
     c["infolog"] = infolog
     c["comment_obj"] = infolog
     c["replay"] = infolog.replay
-
     user = request.user
-    if user == infolog.uploader or UserProfile.objects.filter(is_developer=True, id=user.id).exists():
+
+    if request.method == 'POST':
+        # dev wants to subscribe to infolog changes
+        infolog.subscribed.add(user)
+
+    if user == infolog.uploader or user.userprofile.is_developer:
         return render_to_response('infolog_upload/infolog.html', c, context_instance=RequestContext(request))
     else:
         return HttpResponseRedirect(reverse(not_allowed, args=[infolog.uploader]))
