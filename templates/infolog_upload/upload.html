@@ -1,0 +1,65 @@
+{% extends 'srs_base.html' %}
+
+{% comment %}
+<!-- 
+Please see srs_base.html for license information.
+-->
+{% endcomment %}
+
+{% block pagetitle %}Infolog Upload{% endblock %}
+
+{% block maincontent%}
+    <div class="row">
+      <div class="col-xs-12 col-sm-8 col-sm-offset-2">
+        <h1 class="page-header">Infolog upload</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-8 col-sm-offset-2">
+        <div class="panel panel-warning">
+          <div class="panel-heading">
+            <h3 class="panel-title">Replay upload</h3>
+          </div>
+          <div class="panel-body">
+            <p>If you wish to upload a replay (demofile, *.sdf) file, please follow <a href="{% url 'srs.upload_views.upload' %}">this link</a>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% if status and msg %}
+    <div class="row">
+        <div class="col-xs-12 col-sm-offset-1 col-sm-10 col-md-offset-2 col-md-8">
+            <div class="alert alert-dismissable {% if status == 0 %}alert-success{% else %}alert-danger{% endif %}">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <b>{{ msg }}</b>
+                {% if status == 0 %}<br/>Link: <a href="{{ url }}">Infolog #{{ id }}</a>{% endif %}
+                {%  if saved_infolog and not saved_infolog.replay %}<br/><b>No replay</b> could be associated with the
+                    infolog. Please <a href="{% url "srs.upload_views.upload" %}">upload</a> one.{% endif %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+    <div class="row">
+      <div class="col-sm-8 col-sm-offset-2">
+        <form class="form-horizontal" action="." method="POST" enctype="multipart/form-data" role="form">
+          <fieldset>
+            {% csrf_token %}
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h3 class="panel-title">Upload a infolog</h3>
+              </div>
+              <div class="panel-body">
+                    <div class="col-lg-8 col-lg-offset-2">
+                      {{ form.as_p }}
+                      <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+              </div>
+            </div>
+          <fieldset>
+        </form>
+      </div>
+    </div>
+{% endblock %}
+
+{% block page_js %}
+{% endblock %}

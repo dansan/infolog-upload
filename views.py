@@ -25,7 +25,7 @@ from srs.common import all_page_infos
 from srs.models import Replay
 from lobbyauth.models import UserProfile
 from infolog_upload.models import Infolog
-
+from forms import InfologUploadForm
 
 logger = logging.getLogger(__package__)
 _il = logging.FileHandler(settings.LOG_PATH+'/jsonrpc_debug.log')
@@ -38,16 +38,20 @@ logger.addHandler(_il)
 def index(request):
     c = all_page_infos(request)
     user = request.user
-    if UserProfile.objects.filter(is_developer=True, id=user.userprofile.id).exists():
+    if user.userprofile.is_developer:
         c["infologs"] = Infolog.objects.all()
+        c["subscribed_infologs"] = Infolog.objects.filter(subscribed=user)
+        return render_to_response('infolog_upload/index.html', c, context_instance=RequestContext(request))
+    elif user.infolog_uploader.exists():
+        c["infologs"] = Infolog.objects.filter(uploader=user)
         c["subscribed_infologs"] = Infolog.objects.filter(subscribed=user)
         return render_to_response('infolog_upload/index.html', c, context_instance=RequestContext(request))
     else:
         return HttpResponseRedirect(reverse(not_allowed, args=["_none_"]))
 
 
-@jsonrpc_method('upload(String, String, String, Boolean, dict) -> dict', validate=True, authenticated=True)
-def upload(request, infolog, client, freetext, has_support_ticket, extensions):
+@jsonrpc_method('upload_json(String, String, String, Boolean, dict) -> dict', validate=True, authenticated=True)
+def upload_json(request, infolog, client, freetext, has_support_ticket, extensions):
     """
     JSON-RPC upload function.
     The @jsonrpc_method decorator with authenticated=True prepends "username" and "password" arguments.
@@ -94,22 +98,38 @@ def upload(request, infolog, client, freetext, has_support_ticket, extensions):
         logger.error("Uploaded freetext not properly formatted: %s", te)
         return {"status": 2, "msg": "Uploaded freetext not properly formatted."}
 
-    il = Infolog(infolog_text=infolog_dec.strip(), free_text=freetext_dec.strip(),  uploader=user, client=client,
-                 has_support_ticket=has_support_ticket, severity="Normal")
+    return _save_infolog(user, infolog_dec.strip(), client, freetext_dec.strip(), has_support_ticket,
+                         extensions=extensions)
 
+
+def _save_infolog(user, infolog, client, free_text, has_support_ticket, extensions, severity="Normal"):
+    # logger.debug("user: %s, infolog: %s, client: %s, free_text: %s, has_support_ticket: %s, extensions: %s, "
+    #              "severity: %s", user, infolog, client, free_text, has_support_ticket, extensions, severity)
+
+    logger.debug("user: %s, client: %s, has_support_ticket: %s, extensions: %s, severity: %s", user, client,
+                 has_support_ticket, extensions, severity)
+    logger.debug("free_text: '%s'", free_text)
+    logger.debug("infolog(%s, len: %d): '%s' ... '%s'", type(infolog), len(infolog), infolog[:30], infolog[-30:])
+
+    il = Infolog(infolog_text=infolog, free_text=free_text,  uploader=user, client=client,
+                 has_support_ticket=has_support_ticket)
     try:
-        il_infos = _basic_parse(infolog_dec)
+        il_infos = _basic_parse(infolog)
         il.replay = il_infos["replay"]
         il.game = il_infos["game"]
-        # severity?
-        il.save()
+        # TODO: severity?
+        # TODO: extensions?
     except ObjectDoesNotExist:
         pass
+    except:
+        logger.exception("Exception in _basic_parse()?")
+    finally:
+        il.save()
 
     # TODO: trigger an email to inform game dev if it is marked as supportticket (-> #2)
     # TODO: analyze (-> #3)
 
-    return {"status": 0, "id": int(il.id), "msg": "Success.", "url": il.get_absolute_url()}
+    return {"status": 0, "saved_infolog": il, "id": int(il.id), "msg": "Success.", "url": il.get_absolute_url()}
 
 
 @login_required
@@ -146,3 +166,30 @@ def _basic_parse(infolog):
         out["replay"] = Replay.objects.get(gameID=gameid)
         out["game"] = out["replay"].game
     return out
+
+
+@login_required
+def upload_html(request):
+    c = all_page_infos(request)
+    if request.method == 'POST':
+        form = InfologUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            if form.cleaned_data:
+                infolog_file = request.FILES['infolog_file']
+                if infolog_file.content_type == "text/plain":
+                    free_text = form.cleaned_data['free_text']
+                    has_support_ticket = form.cleaned_data['has_support_ticket']
+                    severity = form.cleaned_data['severity']
+                    il_text = infolog_file.read()
+                    infolog_file.close()
+                    il_text2 = unicode(il_text, errors='replace')
+                    out = _save_infolog(request.user, il_text2.strip(), "manual upload", free_text, has_support_ticket, {},
+                                        severity)
+                    c.update(out)
+                else:
+                    c["status"] = 4
+                    c["msg"] = "Not a infolog.txt file."
+    else:
+        form = InfologUploadForm()
+    c['form'] = form
+    return render_to_response('infolog_upload/upload.html', c, context_instance=RequestContext(request))
