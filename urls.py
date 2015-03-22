@@ -6,6 +6,7 @@ import views
 urlpatterns = patterns('',
                        url(r'^$', 'infolog_upload.views.index'),
                        url(r'^show/(?P<infologid>[\d-]+)/$', 'infolog_upload.views.infolog_view'),
+                       url(r'^not_allowed/(?P<uploader>[\w\ .:()\[\]-]+)/$', 'infolog_upload.views.not_allowed'),
                        url(r'^json/$', jsonrpc_site.dispatch, name='jsonrpc_mountpoint'),
                        url(r'^json/browse/$', 'jsonrpc.views.browse', name='jsonrpc_browser'),
                        )

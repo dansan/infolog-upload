@@ -11,15 +11,19 @@ import base64
 import re
 
 from django.shortcuts import render_to_response, get_object_or_404
+from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 
 from jsonrpc import jsonrpc_method
 
 from srs.common import all_page_infos
 from srs.models import Replay
+from lobbyauth.models import UserProfile
 from infolog_upload.models import Infolog
 
 
@@ -33,8 +37,14 @@ logger.addHandler(_il)
 @login_required
 def index(request):
     c = all_page_infos(request)
-    c["infologs"] = Infolog.objects.all()
-    return render_to_response('infolog_upload/index.html', c, context_instance=RequestContext(request))
+    user = request.user
+    if UserProfile.objects.filter(is_developer=True, id=user.userprofile.id).exists():
+        c["infologs"] = Infolog.objects.all()
+        c["subscribed_infologs"] = Infolog.objects.filter(subscribed=user)
+        return render_to_response('infolog_upload/index.html', c, context_instance=RequestContext(request))
+    else:
+        return HttpResponseRedirect(reverse(not_allowed, args=["_none_"]))
+
 
 @jsonrpc_method('upload(String, String, String, Boolean, dict) -> dict', validate=True, authenticated=True)
 def upload(request, infolog, client, freetext, has_support_ticket, extensions):
@@ -84,8 +94,8 @@ def upload(request, infolog, client, freetext, has_support_ticket, extensions):
         logger.error("Uploaded freetext not properly formatted: %s", te)
         return {"status": 2, "msg": "Uploaded freetext not properly formatted."}
 
-    il = Infolog(infolog_text=infolog_dec, free_text=freetext_dec,  uploader=user, client=client,
-                 has_support_ticket=has_support_ticket)
+    il = Infolog(infolog_text=infolog_dec.strip(), free_text=freetext_dec.strip(),  uploader=user, client=client,
+                 has_support_ticket=has_support_ticket, severity="Normal")
 
     try:
         il_infos = _basic_parse(infolog_dec)
@@ -104,8 +114,22 @@ def upload(request, infolog, client, freetext, has_support_ticket, extensions):
 
 def infolog_view(request, infologid):
     c = all_page_infos(request)
-    c["infolog"] = get_object_or_404(Infolog, id=infologid)
-    return render_to_response('infolog_upload/infolog.html', c, context_instance=RequestContext(request))
+    infolog = get_object_or_404(Infolog, id=infologid)
+    c["infolog"] = infolog
+    c["comment_obj"] = infolog
+    c["replay"] = infolog.replay
+
+    user = request.user
+    if user == infolog.uploader or UserProfile.objects.filter(is_developer=True, id=user.id).exists():
+        return render_to_response('infolog_upload/infolog.html', c, context_instance=RequestContext(request))
+    else:
+        return HttpResponseRedirect(reverse(not_allowed, args=[infolog.uploader]))
+
+
+def not_allowed(request, uploader):
+    c = all_page_infos(request)
+    c["uploader"] = uploader
+    return render_to_response('infolog_upload/not_allowed.html', c, context_instance=RequestContext(request))
 
 
 def _basic_parse(infolog):

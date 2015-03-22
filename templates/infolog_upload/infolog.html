@@ -1,25 +1,96 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title>Infolog</title>
-</head>
-<body>
-<h1>Infolog #{{ infolog.id }}</h1>
+{% extends 'srs_base.html' %}
+{% load comments %}
+{% load admin_urls %}
 
-<p>upload_date: {{ infolog.upload_date|date:"SHORT_DATE_FORMAT" }}</p>
-<p>uploader: {{ infolog.uploader }}</p>
-<p>client: {{ infolog.client }}</p>
-<p>replay.title: {{ infolog.replay.title }}</p>
-<p>Replay: <a href="{{ infolog.replay.get_absolute_url }}">{{ infolog.replay.title }}</a></p>
+{% comment %}
+<!--
+Please see srs_base.html for license information.
+-->
+{% endcomment %}
 
-<h2>freetext</h2>
+{% block page_css %}
+    {% css "css/libs/ionicons.min.css" %}
+{% endblock %}
 
-<p>{{ infolog.free_text|linebreaks }}</p>
+{% block pagetitle %}Infolog #{{ infolog.id }}{% endblock %}
 
-<h2>infolog</h2>
+{% block maincontent%}
+      <div class="row">
+        <div class="col-xs-12">
+          <h1 class="page-header">Infolog #{{ infolog.id }}</h1>
+        </div>
+      </div>
+      <div class="row">
+          <div class="col-xs-12 col-sm-6">
+            <div class="panel panel-default"{% if replay %} itemscope itemtype="http://schema.org/PlayAction"{% endif %}>
+              <div class="panel-body">
+  {% if replay %}
+                <p style="font-size: larger; font-weight: bold;"><a href="{{ replay.get_absolute_url }}"><span itemprop="name" >{{ replay.title }}</span></a></p>
+                <hr style="margin-top: 7px; margin-bottom: 7px;">
+                <a itemprop="url" href="{{ replay.get_absolute_url }}">
+                  <div class="thumb">
+                    <!--  hackish way to center an image vertically... -->
+                    <table cellspacing="0" cellpadding="0" style="height:100px; width: 150px; background-color: inherit;"><tbody><tr><td style="padding: 0px; spacing: 0px; text-align:center; vertical-align:middle;">
+                      <img class="img-responsive img-rounded" itemprop="image" src="{{ STATIC_URL }}maps/{{ replay.map_info.name }}_home.jpg" alt="pic of map {{ replay.map_info.name }}" title="{{ replay.long_text|slice:":128" }}..."/>
+                    </td></tr></tbody></table>
+                  </div>
+                </a>
+      {% include "replay_box.html" %}
+  {% else %}
+                <p style="font-size: larger; font-weight: bold;">No replay available :(</p>
+                <hr style="margin-top: 7px; margin-bottom: 7px;">
+                <p style="margin: 0 0 2px;">Please ask the user to <a href="{% url "srs.upload_views.upload" %}">upload</a> the corresponding replay to the replay site.</p>
+  {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-12 col-sm-6">
+            <div class="panel panel-default">
+              <div class="panel-body">
+                <p style="font-size: larger; font-weight: bold;">Infolog #{{ infolog.id }}</p>
+                <hr style="margin-top: 7px; margin-bottom: 7px;">
+                <p style="margin: 0 0 2px;">Upload date: {{ infolog.upload_date|date:"LONG_DATETIME_FORMAT" }}</p>
+                <p style="margin: 0 0 2px;">Uploader: <a href="{% url 'srs.views.player' user.get_profile.accountid %}">{{ infolog.uploader }}</a></p>
+                <p style="margin: 0 0 2px;">Client software: {{ infolog.client }}</p>
+                <p style="margin: 0 0 2px;">External link: {% if infolog.ext_link %}<a href="{{ infolog.ext_link }}">{{ infolog.ext_link }}</a>{% else %}None{% endif %}</p>
+                {% if user.is_staff %}<p class="text-success"><a href="{% url 'admin:infolog_upload_infolog_change' infolog.pk %}">infolog @admin site</a></p>{% endif %}
 
-<p><code>{{ infolog.infolog_text|linebreaks }}</code></p>
-<hr/>
-</body>
-</html>
+                <p style="font-size: larger; font-weight: bold;">User supplied text</p>
+                <hr style="margin-top: 7px; margin-bottom: 7px;">
+                <textarea readonly style="color: #000000; height: 64px; width: 100%;">{{ infolog.free_text }}</textarea>
+              </div>
+            </div>
+          </div>
+      </div>
+
+      <div class="row">
+          <div class="col-xs-12">
+            <div class="panel panel-default">
+              <div class="panel-body">
+                <p style="font-size: larger; font-weight: bold;">Infolog</p>
+                <textarea readonly style="color: #000000; height: 512px; width: 100%;">{{ infolog.infolog_text }}</textarea>
+              </div>
+            </div>
+          </div>
+      </div>
+
+    <div class="row">
+      <div class="col-sx-12" style="padding-left: 15px; padding-right: 15px;">
+        <div class="panel panel-default" itemscope itemtype="http://schema.org/WebPage">
+    {% get_comment_count for infolog as comment_count %}
+          <div class="panel-heading"><b>Comments</b><br/></div>
+          <div class="panel-body">
+    {% render_comment_list for infolog %}
+            <a name="afterlastcomment"></a>
+
+    {% if user.is_authenticated %}
+        {% render_comment_form for infolog %}
+    {% endif %}
+          </div>
+        </div>
+      </div>
+    </div> <!-- row -->
+{% endblock %}
+
+{% block page_js %}
+{% endblock %}
