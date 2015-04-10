@@ -24,7 +24,7 @@ from jsonrpc import jsonrpc_method
 from srs.common import all_page_infos
 from srs.models import Replay
 from infolog_upload.models import Infolog, InfologTag
-from forms import InfologUploadForm
+from forms import InfologUploadForm, NewTagForm
 
 logger = logging.getLogger(__package__)
 _il = logging.FileHandler(settings.LOG_PATH+'/jsonrpc_debug.log')
@@ -198,16 +198,35 @@ def upload_html(request):
 @login_required
 @never_cache
 def modal_manage_tags(request, infologid):
-    c = all_page_infos(request)
-
     user = request.user
     infolog = get_object_or_404(Infolog, id=infologid)
-
     if not (user == infolog.uploader or user.userprofile.is_developer):
         return HttpResponseRedirect(reverse(not_allowed, args=[infolog.uploader]))
 
+    c = all_page_infos(request)
+    if request.method == 'POST':
+        form = NewTagForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data:
+                name = form.cleaned_data.get("name")
+                if name:
+                    ilt, _ = InfologTag.objects.get_or_create(name=name.strip())
+                    infolog.tags.add(ilt)
+                    return HttpResponseRedirect(reverse(infolog_view, args=[infolog.id]))
+        else:
+            if form.instance and isinstance(form.instance, InfologTag):
+                # error was 'Infolog tag with this Name already exists.'. Ignored.
+                try:
+                    ilt = InfologTag.objects.get(name=form.instance.name)
+                    infolog.tags.add(ilt)
+                    return HttpResponseRedirect(reverse(infolog_view, args=[infolog.id]))
+                except:
+                    pass
+    else:
+        form = NewTagForm()
     c["infolog"] = infolog
     c["all_tags"] = InfologTag.objects.exclude(id__in=infolog.tags.values_list("id", flat=True))
+    c["newtagform"] = form
     return render_to_response('infolog_upload/modal_manage_tags.html', c, context_instance=RequestContext(request))
 
 

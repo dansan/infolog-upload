@@ -21,7 +21,17 @@ Please see srs_base.html for license information.
               <p><br></p>
 
               <h4>Create a new Tag</h4>
-              <p>FORM</p>
+              <form class="form" action="{{ selfurl }}" method="POST" role="form">
+                  {% csrf_token %}
+                  <div class="form-group">
+                      <div class="input-group">
+                          {{ newtagform.name }}
+                          <span class="input-group-btn">
+                              <button class="btn btn-default btn-sm" type="submit">Create</button>
+                          </span>
+                      </div>
+                  </div>
+              </form>
           </div>
           <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
