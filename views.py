@@ -17,14 +17,13 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
+from django.views.decorators.cache import never_cache
 
 from jsonrpc import jsonrpc_method
 
 from srs.common import all_page_infos
 from srs.models import Replay
-from lobbyauth.models import UserProfile
-from infolog_upload.models import Infolog
+from infolog_upload.models import Infolog, InfologTag
 from forms import InfologUploadForm
 
 logger = logging.getLogger(__package__)
@@ -133,6 +132,7 @@ def _save_infolog(user, infolog, client, free_text, has_support_ticket, extensio
 
 
 @login_required
+@never_cache
 def infolog_view(request, infologid):
     c = all_page_infos(request)
     infolog = get_object_or_404(Infolog, id=infologid)
@@ -193,3 +193,45 @@ def upload_html(request):
         form = InfologUploadForm()
     c['form'] = form
     return render_to_response('infolog_upload/upload.html', c, context_instance=RequestContext(request))
+
+
+@login_required
+@never_cache
+def modal_manage_tags(request, infologid):
+    c = all_page_infos(request)
+
+    user = request.user
+    infolog = get_object_or_404(Infolog, id=infologid)
+
+    if not (user == infolog.uploader or user.userprofile.is_developer):
+        return HttpResponseRedirect(reverse(not_allowed, args=[infolog.uploader]))
+
+    c["infolog"] = infolog
+    c["all_tags"] = InfologTag.objects.exclude(id__in=infolog.tags.values_list("id", flat=True))
+    return render_to_response('infolog_upload/modal_manage_tags.html', c, context_instance=RequestContext(request))
+
+
+@login_required
+@never_cache
+def modal_manage_tags_rm(request, infologid, tagid):
+    user = request.user
+    infolog = get_object_or_404(Infolog, id=infologid)
+
+    if not (user == infolog.uploader or user.userprofile.is_developer):
+        return HttpResponseRedirect(reverse(not_allowed, args=[infolog.uploader]))
+
+    infolog.tags.remove(InfologTag.objects.get(id=tagid))
+    return HttpResponseRedirect(reverse(infolog_view, args=[infolog.id]))
+
+
+@login_required
+@never_cache
+def modal_manage_tags_add(request, infologid, tagid):
+    user = request.user
+    infolog = get_object_or_404(Infolog, id=infologid)
+
+    if not (user == infolog.uploader or user.userprofile.is_developer):
+        return HttpResponseRedirect(reverse(not_allowed, args=[infolog.uploader]))
+
+    infolog.tags.add(InfologTag.objects.get(id=tagid))
+    return HttpResponseRedirect(reverse(infolog_view, args=[infolog.id]))

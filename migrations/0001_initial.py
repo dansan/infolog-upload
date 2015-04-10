@@ -8,25 +8,60 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'InfologTag'
+        db.create_table(u'infolog_upload_infologtag', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=128, db_index=True)),
+        ))
+        db.send_create_signal(u'infolog_upload', ['InfologTag'])
+
         # Adding model 'Infolog'
         db.create_table(u'infolog_upload_infolog', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('infolog_text', self.gf('django.db.models.fields.TextField')()),
             ('free_text', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('replay', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['srs.Replay'], null=True, blank=True)),
-            ('uploader', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('uploader', self.gf('django.db.models.fields.related.ForeignKey')(related_name='infolog_uploader', to=orm['auth.User'])),
             ('upload_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, db_index=True, blank=True)),
             ('client', self.gf('django.db.models.fields.CharField')(max_length=256)),
-            ('has_support_ticket', self.gf('django.db.models.fields.BooleanField')()),
-            ('severity', self.gf('django.db.models.fields.CharField')(max_length=32, blank=True)),
+            ('has_support_ticket', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('severity', self.gf('django.db.models.fields.CharField')(default='Normal', max_length=32, blank=True)),
             ('game', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['srs.Game'], null=True, blank=True)),
+            ('ext_link', self.gf('django.db.models.fields.URLField')(max_length=200, blank=True)),
         ))
         db.send_create_signal(u'infolog_upload', ['Infolog'])
 
+        # Adding M2M table for field subscribed on 'Infolog'
+        m2m_table_name = db.shorten_name(u'infolog_upload_infolog_subscribed')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('infolog', models.ForeignKey(orm[u'infolog_upload.infolog'], null=False)),
+            ('user', models.ForeignKey(orm[u'auth.user'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['infolog_id', 'user_id'])
+
+        # Adding M2M table for field tags on 'Infolog'
+        m2m_table_name = db.shorten_name(u'infolog_upload_infolog_tags')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('infolog', models.ForeignKey(orm[u'infolog_upload.infolog'], null=False)),
+            ('infologtag', models.ForeignKey(orm[u'infolog_upload.infologtag'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['infolog_id', 'infologtag_id'])
+
 
     def backwards(self, orm):
+        # Deleting model 'InfologTag'
+        db.delete_table(u'infolog_upload_infologtag')
+
         # Deleting model 'Infolog'
         db.delete_table(u'infolog_upload_infolog')
+
+        # Removing M2M table for field subscribed on 'Infolog'
+        db.delete_table(db.shorten_name(u'infolog_upload_infolog_subscribed'))
+
+        # Removing M2M table for field tags on 'Infolog'
+        db.delete_table(db.shorten_name(u'infolog_upload_infolog_tags'))
 
 
     models = {
@@ -69,15 +104,23 @@ class Migration(SchemaMigration):
         u'infolog_upload.infolog': {
             'Meta': {'object_name': 'Infolog'},
             'client': ('django.db.models.fields.CharField', [], {'max_length': '256'}),
+            'ext_link': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'}),
             'free_text': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'game': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['srs.Game']", 'null': 'True', 'blank': 'True'}),
-            'has_support_ticket': ('django.db.models.fields.BooleanField', [], {}),
+            'has_support_ticket': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'infolog_text': ('django.db.models.fields.TextField', [], {}),
             'replay': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['srs.Replay']", 'null': 'True', 'blank': 'True'}),
-            'severity': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'}),
+            'severity': ('django.db.models.fields.CharField', [], {'default': "'Normal'", 'max_length': '32', 'blank': 'True'}),
+            'subscribed': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'subscriber'", 'blank': 'True', 'to': u"orm['auth.User']"}),
+            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['infolog_upload.InfologTag']", 'symmetrical': 'False', 'blank': 'True'}),
             'upload_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'uploader': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+            'uploader': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'infolog_uploader'", 'to': u"orm['auth.User']"})
+        },
+        u'infolog_upload.infologtag': {
+            'Meta': {'object_name': 'InfologTag'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '128', 'db_index': 'True'})
         },
         u'srs.game': {
             'Meta': {'ordering': "['name']", 'object_name': 'Game'},

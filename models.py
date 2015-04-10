@@ -10,7 +10,14 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.comments import Comment
 
-from srs.models import Game, Replay, Tag
+from srs.models import Game, Replay
+
+
+class InfologTag(models.Model):
+    name = models.CharField(max_length=128, unique=True, db_index=True)
+
+    def __unicode__(self):
+        return self.name
 
 
 class Infolog(models.Model):
@@ -28,8 +35,8 @@ class Infolog(models.Model):
     severity = models.CharField(max_length=32, choices=SEVERITY_CHOICES, default="Normal", blank=True)
     game = models.ForeignKey(Game, blank=True, null=True)
     ext_link = models.URLField(blank=True)
-    subscribed = models.ManyToManyField(User, related_name="subscriber")
-    tags = models.ManyToManyField(Tag, blank=True)
+    subscribed = models.ManyToManyField(User, blank=True, related_name="subscriber")
+    tags = models.ManyToManyField(InfologTag, blank=True)
 
     def __unicode__(self):
         return u"(%04d, %s) %s | %s" % (self.id, self.upload_date.strftime("%Y-%m-%d"), self.replay,

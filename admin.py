@@ -17,3 +17,4 @@ class InfologAdmin(admin.ModelAdmin):
     list_filter = ("severity", "game", "has_support_ticket", "client", "upload_date", "replay__unixTime")
 
 admin.site.register(Infolog, InfologAdmin)
+admin.site.register(InfologTag)
