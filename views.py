@@ -142,7 +142,7 @@ def _save_infolog(user, infolog, client, free_text, has_support_ticket, extensio
 
     AnalyzeThread(il).start()
 
-    return {"status": 0, "saved_infolog": il, "id": int(il.id), "msg": "Success.", "url": il.get_absolute_url()}
+    return {"status": 0, "id": int(il.id), "msg": "Success.", "url": il.get_absolute_url()}
 
 
 @login_required

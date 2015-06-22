@@ -37,7 +37,7 @@ class AnalyzeThread(threading.Thread):
         self.thread.start_time = datetime.datetime.now()
         logger.info("Running in thread '%s'.", self.thread.name)
         for analyzer in self.analyzers:
-            logger.info("Starting analyzer '%s'.", analyzer)
+            logger.info("Starting analyzer '%s'.", analyzer.name)
             try:
                 result = analyzer.analyse()
             except:
