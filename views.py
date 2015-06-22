@@ -9,6 +9,7 @@
 import logging
 import base64
 import re
+import hashlib
 
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -25,6 +26,7 @@ from srs.common import all_page_infos
 from srs.models import Replay
 from infolog_upload.models import Infolog, InfologTag
 from forms import InfologUploadForm, NewTagForm
+from analyze_thread import AnalyzeThread
 
 logger = logging.getLogger(__package__)
 _il = logging.FileHandler(settings.LOG_PATH+'/jsonrpc_debug.log')
@@ -110,8 +112,18 @@ def _save_infolog(user, infolog, client, free_text, has_support_ticket, extensio
     logger.debug("free_text: '%s'", free_text)
     logger.debug("infolog(%s, len: %d): '%s' ... '%s'", type(infolog), len(infolog), infolog[:30], infolog[-30:])
 
-    il = Infolog(infolog_text=infolog, free_text=free_text,  uploader=user, client=client,
-                 has_support_ticket=has_support_ticket)
+    sha256 = hashlib.sha256(base64.b64encode(infolog.encode("utf-8"))).hexdigest()
+    # not using get_or_create() to save comparison of infolog_text
+    try:
+        il = Infolog.objects.get(infolog_text_sha256=sha256)
+    except ObjectDoesNotExist:
+        il = Infolog.objects.create(infolog_text_sha256=sha256, infolog_text=infolog, uploader=user, client=client)
+
+    il.free_text = free_text
+    il.uploader = user
+    il.client = client
+    il.has_support_ticket = has_support_ticket
+
     try:
         il_infos = _basic_parse(infolog)
         il.replay = il_infos["replay"]
@@ -121,12 +133,14 @@ def _save_infolog(user, infolog, client, free_text, has_support_ticket, extensio
     except ObjectDoesNotExist:
         pass
     except:
-        logger.exception("Exception in _basic_parse()?")
+        logger.exception("Exception in _basic_parse()")
+        return
     finally:
         il.save()
 
     # TODO: trigger an email to inform game dev if it is marked as supportticket (-> #2)
-    # TODO: analyze (-> #3)
+
+    AnalyzeThread(il).start()
 
     return {"status": 0, "saved_infolog": il, "id": int(il.id), "msg": "Success.", "url": il.get_absolute_url()}
 
@@ -185,7 +199,7 @@ def upload_html(request):
                     il_text2 = unicode(il_text, errors='replace')
                     out = _save_infolog(request.user, il_text2.strip(), "manual upload", free_text, has_support_ticket, {},
                                         severity)
-                    c.update(out)
+                    return HttpResponseRedirect(out["url"])
                 else:
                     c["status"] = 4
                     c["msg"] = "Not a infolog.txt file."

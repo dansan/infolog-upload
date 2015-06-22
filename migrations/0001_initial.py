@@ -28,6 +28,7 @@ class Migration(SchemaMigration):
             ('severity', self.gf('django.db.models.fields.CharField')(default='Normal', max_length=32, blank=True)),
             ('game', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['srs.Game'], null=True, blank=True)),
             ('ext_link', self.gf('django.db.models.fields.URLField')(max_length=200, blank=True)),
+            ('infolog_text_sha256', self.gf('django.db.models.fields.CharField')(unique=True, max_length=64)),
         ))
         db.send_create_signal(u'infolog_upload', ['Infolog'])
 
@@ -110,6 +111,7 @@ class Migration(SchemaMigration):
             'has_support_ticket': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'infolog_text': ('django.db.models.fields.TextField', [], {}),
+            'infolog_text_sha256': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '64'}),
             'replay': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['srs.Replay']", 'null': 'True', 'blank': 'True'}),
             'severity': ('django.db.models.fields.CharField', [], {'default': "'Normal'", 'max_length': '32', 'blank': 'True'}),
             'subscribed': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'subscriber'", 'blank': 'True', 'to': u"orm['auth.User']"}),

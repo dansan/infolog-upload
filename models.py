@@ -37,6 +37,7 @@ class Infolog(models.Model):
     ext_link = models.URLField(blank=True)
     subscribed = models.ManyToManyField(User, blank=True, related_name="subscriber")
     tags = models.ManyToManyField(InfologTag, blank=True)
+    infolog_text_sha256 = models.CharField(max_length=64, unique=True)
 
     def __unicode__(self):
         return u"(%04d, %s) %s | %s" % (self.id, self.upload_date.strftime("%Y-%m-%d"), self.replay,
@@ -54,3 +55,23 @@ class Infolog(models.Model):
 
     def is_subscribed(self, user):
         return self.subscribed.filter(id=user.id).exists()
+
+    def to_dict(self):
+        return {"id": self.id,
+                "infolog_text": self.infolog_text,
+                "free_text": self.free_text,
+                "replay": self.replay.title,
+                "replay_id": self.replay.id,
+                "uploader": self.uploader.username,
+                "upload_date": self.upload_date,
+                "client": self.client,
+                "has_support_ticket": self.has_support_ticket,
+                "severity": self.severity,
+                "game": self.game.name,
+                "game_id": self.game.id,
+                "game_devs": ",".join(self.game.developer.all().values_list("username", flat=True)) if
+                self.game.developer.exists() else "",
+                "ext_link": self.ext_link,
+                "subscribed": self.subscribed,
+                "tags": ",".join(self.tags.all().values_list("name", flat=True)) if self.tags.exists() else "",
+                "infolog_text_sha256": self.infolog_text_sha256}
