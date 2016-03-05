@@ -1,7 +1,7 @@
 # This file is part of the "infolog-upload" program. It is published
 # under the GPLv3.
 #
-# Copyright (C) 2015 Daniel Troeder (daniel #at# admin-box #dot# com)
+# Copyright (C) 2016 Daniel Troeder (daniel #at# admin-box #dot# com)
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -16,11 +16,12 @@ from django.conf import settings
 from infolog_upload.models import Infolog, InfologTag
 from analyzer1 import InfologAnalyzer1
 
-logger = logging.getLogger(__package__)
-_il = logging.FileHandler(settings.LOG_PATH+'/analyse.log')
+logger = logging.getLogger("srs.infolog")
+_il = logging.FileHandler(settings.LOG_PATH + '/analyse.log')
 _il.setLevel(logging.DEBUG)
 _il.setFormatter(logging.Formatter(fmt=settings.DEBUG_FORMAT, datefmt=settings.LOG_DATETIME_FORMAT))
 logger.addHandler(_il)
+
 
 class AnalyzeThread(threading.Thread):
     def __init__(self, infolog):
@@ -62,4 +63,4 @@ class AnalyzeThread(threading.Thread):
             except:
                 logger.exception("Error in result of analyzer '%s'.", analyzer.name)
         logger.info("All analyzers ran, thread finished after %d seconds.", (datetime.datetime.now() -
-                                                                               self.thread.start_time).seconds)
+                                                                             self.thread.start_time).seconds)

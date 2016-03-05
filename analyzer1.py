@@ -1,7 +1,7 @@
 # This file is part of the "infolog-upload" program. It is published
 # under the GPLv3.
 #
-# Copyright (C) 2015: see commit history at
+# Copyright (C) 2016: see commit history at
 # https://github.com/dansan/infolog-upload/commits/master/analyzer1.py
 #
 # You should have received a copy of the GNU General Public License
@@ -9,10 +9,12 @@
 
 from analyzer import InfologAnalyzer
 
+
 class InfologAnalyzer1(InfologAnalyzer):
     """
     Stuff from https://github.com/spring/spring-infolog goes here
     """
+
     def __init__(self, logger, infolog, replay):
         super(InfologAnalyzer1, self).__init__(logger, infolog, replay)
         self.name = "Infolog Analyzer the First"

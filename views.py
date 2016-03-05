@@ -1,7 +1,7 @@
 # This file is part of the "infolog-upload" program. It is published
 # under the GPLv3.
 #
-# Copyright (C) 2015 Daniel Troeder (daniel #at# admin-box #dot# com)
+# Copyright (C) 2016 Daniel Troeder (daniel #at# admin-box #dot# com)
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -28,8 +28,8 @@ from infolog_upload.models import Infolog, InfologTag
 from forms import InfologUploadForm, NewTagForm
 from analyze_thread import AnalyzeThread
 
-logger = logging.getLogger(__package__)
-_il = logging.FileHandler(settings.LOG_PATH+'/jsonrpc_debug.log')
+logger = logging.getLogger("srs.infolog")
+_il = logging.FileHandler(settings.LOG_PATH + '/jsonrpc_debug.log')
 _il.setLevel(logging.DEBUG)
 _il.setFormatter(logging.Formatter(fmt=settings.DEBUG_FORMAT, datefmt=settings.LOG_DATETIME_FORMAT))
 logger.addHandler(_il)
@@ -174,7 +174,7 @@ def not_allowed(request, uploader):
 def _basic_parse(infolog):
     out = {"replay": None, "game": None}
 
-    m = re.search(r"\[.*\] GameID: (\w+)",  infolog)
+    m = re.search(r"\[.*\] GameID: (\w+)", infolog)
     if m:
         gameid = m.group(1)
         out["replay"] = Replay.objects.get(gameID=gameid)
@@ -197,8 +197,8 @@ def upload_html(request):
                     il_text = infolog_file.read()
                     infolog_file.close()
                     il_text2 = unicode(il_text, errors='replace')
-                    out = _save_infolog(request.user, il_text2.strip(), "manual upload", free_text, has_support_ticket, {},
-                                        severity)
+                    out = _save_infolog(request.user, il_text2.strip(), "manual upload", free_text, has_support_ticket,
+                                        {}, severity)
                     return HttpResponseRedirect(out["url"])
                 else:
                     c["status"] = 4

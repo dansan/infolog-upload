@@ -1,10 +1,10 @@
 # This file is part of the "spring relay site / srs" program. It is published
 # under the GPLv3.
 #
-# Copyright (C) 2012 Daniel Troeder (daniel #at# admin-box #dot# com)
+# Copyright (C) 2016 Daniel Troeder (daniel #at# admin-box #dot# com)
 #
-#You should have received a copy of the GNU General Public License
-#along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django import forms
 from django.forms import ModelForm
@@ -12,7 +12,8 @@ from django.forms import ModelForm
 from infolog_upload.models import Infolog, InfologTag
 
 import logging
-logger = logging.getLogger(__package__)
+
+logger = logging.getLogger("srs.infolog")
 
 
 class InfologUploadForm(forms.Form):
