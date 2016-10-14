@@ -50,7 +50,7 @@ class Infolog(models.Model):
     @property
     def comments_count(self):
         from django.contrib.contenttypes.models import ContentType
-        ct = ContentType.objects.get(name="infolog")
+        ct = ContentType.objects.get(model="infolog")
         return Comment.objects.filter(content_type=ct, object_pk=self.pk).count()
 
     def is_subscribed(self, user):
