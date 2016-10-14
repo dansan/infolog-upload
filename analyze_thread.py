@@ -12,9 +12,12 @@ import datetime
 
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 
 from infolog_upload.models import Infolog, InfologTag
-from analyzer1 import InfologAnalyzer1
+from infolog_upload.analyzer import InfologAnalyzerError
+from infolog_upload.analyzer1 import InfologAnalyzer1
+
 
 logger = logging.getLogger("srs.infolog")
 _il = logging.FileHandler(settings.LOG_PATH + '/analyse.log')
@@ -41,7 +44,7 @@ class AnalyzeThread(threading.Thread):
             logger.info("Starting analyzer '%s'.", analyzer.name)
             try:
                 result = analyzer.analyse()
-            except:
+            except InfologAnalyzerError:
                 logger.exception("Error running analyzer '%s'.", analyzer.name)
                 continue
             logger.debug("Analyzer '%s' returned data: '%s'.", analyzer.name, result)
@@ -54,13 +57,14 @@ class AnalyzeThread(threading.Thread):
                     try:
                         user = User.objects.get(username=username)
                         self.infolog.subscribed.add(user)
-                    except:
+                    except ObjectDoesNotExist:
                         logger.error("No user found with username='%s'.", username)
                 for tag in result.get("tags", []):
                     ilt, _ = InfologTag.objects.get_or_create(name=tag)
                     self.infolog.tags.add(ilt)
                 self.infolog.save()
             except:
+                logger.error("FIXME: to broad exception handling.")
                 logger.exception("Error in result of analyzer '%s'.", analyzer.name)
         logger.info("All analyzers ran, thread finished after %d seconds.", (datetime.datetime.now() -
                                                                              self.thread.start_time).seconds)

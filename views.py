@@ -132,9 +132,6 @@ def _save_infolog(user, infolog, client, free_text, has_support_ticket, extensio
         # TODO: extensions?
     except ObjectDoesNotExist:
         pass
-    except:
-        logger.exception("Exception in _basic_parse()")
-        return
     finally:
         il.save()
 
