@@ -60,18 +60,18 @@ class Infolog(models.Model):
         return {"id": self.id,
                 "infolog_text": self.infolog_text,
                 "free_text": self.free_text,
-                "replay": self.replay.title,
-                "replay_id": self.replay.id,
+                "replay": self.replay.title if self.replay else "FIXME: no replay",
+                "replay_id": self.replay.id if self.replay else 0,  # "FIXME: no replay"
                 "uploader": self.uploader.username,
                 "upload_date": self.upload_date,
                 "client": self.client,
                 "has_support_ticket": self.has_support_ticket,
                 "severity": self.severity,
-                "game": self.game.name,
-                "game_id": self.game.id,
-                "game_devs": ",".join(self.game.developer.all().values_list("username", flat=True)) if
+                "game": self.game.name if self.game else "FIXME: no game",
+                "game_id": self.game.id if self.game else 0,  # "FIXME: no game"
+                "game_devs": ",".join(self.game.developer.all().values_list("username", flat=True)) if self.game and
                 self.game.developer.exists() else "",
                 "ext_link": self.ext_link,
                 "subscribed": self.subscribed,
-                "tags": ",".join(self.tags.all().values_list("name", flat=True)) if self.tags.exists() else "",
+                "tags": ",".join(self.tags.all().values_list("name", flat=True)) if self.tags and self.tags.exists() else "",
                 "infolog_text_sha256": self.infolog_text_sha256}
