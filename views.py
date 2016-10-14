@@ -15,7 +15,6 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.views.decorators.cache import never_cache
@@ -29,10 +28,6 @@ from forms import InfologUploadForm, NewTagForm
 from analyze_thread import AnalyzeThread
 
 logger = logging.getLogger("srs.infolog")
-_il = logging.FileHandler(settings.LOG_PATH + '/jsonrpc_debug.log')
-_il.setLevel(logging.DEBUG)
-_il.setFormatter(logging.Formatter(fmt=settings.DEBUG_FORMAT, datefmt=settings.LOG_DATETIME_FORMAT))
-logger.addHandler(_il)
 
 
 @login_required
@@ -186,6 +181,7 @@ def upload_html(request):
         form = InfologUploadForm(request.POST, request.FILES)
         if form.is_valid():
             if form.cleaned_data:
+                logger.debug("form.cleaned_data=%r", form.cleaned_data)
                 infolog_file = request.FILES['infolog_file']
                 if infolog_file.content_type == "text/plain":
                     free_text = form.cleaned_data['free_text']

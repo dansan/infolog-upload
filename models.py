@@ -8,7 +8,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.comments import Comment
+from django_comments.models import Comment
 
 from srs.models import Game, Replay
 

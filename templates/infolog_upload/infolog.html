@@ -1,6 +1,7 @@
 {% extends 'srs_base.html' %}
 {% load comments %}
 {% load admin_urls %}
+{% load static %}
 
 {% comment %}
 <!--
@@ -31,7 +32,7 @@ Please see srs_base.html for license information.
                   <div class="thumb">
                     <!--  hackish way to center an image vertically... -->
                     <table cellspacing="0" cellpadding="0" style="height:100px; width: 150px; background-color: inherit;"><tbody><tr><td style="padding: 0px; spacing: 0px; text-align:center; vertical-align:middle;">
-                      <img class="img-responsive img-rounded" itemprop="image" src="{{ STATIC_URL }}maps/{{ replay.map_info.name }}_home.jpg" alt="pic of map {{ replay.map_info.name }}" title="{{ replay.long_text|slice:":128" }}..."/>
+                      <img class="img-responsive img-rounded" itemprop="image" src="{% get_static_prefix %}maps/{{ replay.map_info.name }}_home.jpg" alt="pic of map {{ replay.map_info.name }}" title="{{ replay.long_text|slice:":128" }}..."/>
                     </td></tr></tbody></table>
                   </div>
                 </a>
@@ -50,7 +51,7 @@ Please see srs_base.html for license information.
                 <p style="font-size: larger; font-weight: bold;">Infolog #{{ infolog.id }}</p>
                 <hr style="margin-top: 7px; margin-bottom: 7px;">
                 <p style="margin: 0 0 2px;">Upload date: {{ infolog.upload_date|date:"LONG_DATETIME_FORMAT" }}</p>
-                <p style="margin: 0 0 2px;">Uploader: <a href="{% url 'srs.views.player' user.get_profile.accountid %}">{{ infolog.uploader }}</a></p>
+                <p style="margin: 0 0 2px;">Uploader: <a href="{% url 'srs.views.player' user.userprofile.accountid %}">{{ infolog.uploader }}</a></p>
                 <p style="margin: 0 0 2px;">Client software: {{ infolog.client }}</p>
                 <p style="margin: 0 0 2px;">External link: {% if infolog.ext_link %}<a href="{{ infolog.ext_link }}">{{ infolog.ext_link }}</a>{% else %}None{% endif %}</p>
                 {% if user.is_staff %}<p class="text-success"><a href="{% url 'admin:infolog_upload_infolog_change' infolog.pk %}">infolog @admin site</a></p>{% endif %}
