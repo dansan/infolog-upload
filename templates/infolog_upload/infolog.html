@@ -50,7 +50,7 @@ Please see srs_base.html for license information.
               <div class="panel-body">
                 <p style="font-size: larger; font-weight: bold;">Infolog #{{ infolog.id }}</p>
                 <hr style="margin-top: 7px; margin-bottom: 7px;">
-                <p style="margin: 0 0 2px;">Upload date: {{ infolog.upload_date|date:"LONG_DATETIME_FORMAT" }}</p>
+                <p style="margin: 0 0 2px;">Upload date: {{ infolog.upload_date|date:"d.m.Y H:i:s (T)" }}</p>
                 <p style="margin: 0 0 2px;">Uploader: <a href="{% url 'srs.views.player' user.userprofile.accountid %}">{{ infolog.uploader }}</a></p>
                 <p style="margin: 0 0 2px;">Client software: {{ infolog.client }}</p>
                 <p style="margin: 0 0 2px;">External link: {% if infolog.ext_link %}<a href="{{ infolog.ext_link }}">{{ infolog.ext_link }}</a>{% else %}None{% endif %}</p>
