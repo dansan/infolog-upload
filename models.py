@@ -39,7 +39,7 @@ class Infolog(models.Model):
     replay_gameID = models.CharField(max_length=32, blank=True)
 
     def __unicode__(self):
-        return u"(%04d, %s) %s" % (self.id, self.upload_date.strftime("%Y-%m-%d"), self.replay)
+        return u"Infolog({}, {}, {})".format(self.pk, self.upload_date.strftime("%Y-%m-%d"), self.replay)
 
     @models.permalink
     def get_absolute_url(self):
