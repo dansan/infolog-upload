@@ -119,16 +119,13 @@ def _save_infolog(user, infolog, client, free_text, has_support_ticket, extensio
     il.client = client
     il.has_support_ticket = has_support_ticket
 
-    try:
-        il_infos = _basic_parse(infolog)
-        il.replay = il_infos["replay"]
-        il.game = il_infos["game"]
-        # TODO: severity?
-        # TODO: extensions?
-    except ObjectDoesNotExist:
-        pass
-    finally:
-        il.save()
+    il_infos = _basic_parse(infolog)
+    il.replay_gameID = il_infos["replay_gameID"]
+    il.replay = il_infos["replay"]
+    il.game = il_infos["game"]
+    # TODO: severity?
+    # TODO: extensions?
+    il.save()
 
     # TODO: trigger an email to inform game dev if it is marked as supportticket (-> #2)
 
@@ -164,13 +161,21 @@ def not_allowed(request, uploader):
 
 
 def _basic_parse(infolog):
-    out = {"replay": None, "game": None}
+    out = {"replay": None, "game": None, "replay_gameID": None}
 
     m = re.search(r"\[.*\] GameID: (\w+)", infolog)
     if m:
         gameid = m.group(1)
-        out["replay"] = Replay.objects.get(gameID=gameid)
-        out["game"] = out["replay"].game
+        out["replay_gameID"] = gameid
+        logger.debug("Infolog replays gameID is %r.", gameid)
+        try:
+            out["replay"] = Replay.objects.get(gameID=gameid)
+            logger.info("Infologs replay is %s.", out["replay"])
+            out["game"] = out["replay"].game
+        except ObjectDoesNotExist:
+            logger.info("Did not find replay with gameID %r for uploaded infolog.", gameid)
+    else:
+        logger.error("Could not find gameID in uploaded infolog!")
     return out
 
 

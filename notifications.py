@@ -7,6 +7,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from django.core.exceptions import ObjectDoesNotExist
+from infolog_upload.models import Infolog
 
 logger = logging.getLogger("srs.infolog")
 
@@ -18,3 +20,15 @@ class Notifications(object):
 
     def new_comment(self, infolog):
         logger.debug("Infolog: %s", infolog)
+
+    @staticmethod
+    def new_replay(replay):
+        logger.debug("Replay: %s", replay)
+        try:
+            il = Infolog.objects.get(replay_gameID=replay.gameID)
+            logger.info("Found replay %s to associate with Infolog %s.", replay, il)
+            il.replay = replay
+            il.save()
+        except ObjectDoesNotExist:
+            logger.info("Replay %s not associated with any Infolog.", replay)
+            pass

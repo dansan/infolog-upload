@@ -10,8 +10,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django_comments.models import Comment
 
-from srs.models import Game, Replay
-
 
 class InfologTag(models.Model):
     name = models.CharField(max_length=128, unique=True, db_index=True)
@@ -27,21 +25,21 @@ class Infolog(models.Model):
 
     infolog_text = models.TextField()
     free_text = models.TextField(blank=True)
-    replay = models.ForeignKey(Replay, blank=True, null=True)
+    replay = models.ForeignKey("srs.Replay", blank=True, null=True)
     uploader = models.ForeignKey(User, related_name="infolog_uploader")
     upload_date = models.DateTimeField(auto_now_add=True, db_index=True)
     client = models.CharField(max_length=256)
     has_support_ticket = models.BooleanField(default=False)
     severity = models.CharField(max_length=32, choices=SEVERITY_CHOICES, default="Normal", blank=True)
-    game = models.ForeignKey(Game, blank=True, null=True)
+    game = models.ForeignKey("srs.Game", blank=True, null=True)
     ext_link = models.URLField(blank=True)
     subscribed = models.ManyToManyField(User, blank=True, related_name="subscriber")
     tags = models.ManyToManyField(InfologTag, blank=True)
     infolog_text_sha256 = models.CharField(max_length=64, unique=True)
+    replay_gameID = models.CharField(max_length=32, blank=True)
 
     def __unicode__(self):
-        return u"(%04d, %s) %s | %s" % (self.id, self.upload_date.strftime("%Y-%m-%d"), self.replay,
-                                        self.infolog_text[:30])
+        return u"(%04d, %s) %s" % (self.id, self.upload_date.strftime("%Y-%m-%d"), self.replay)
 
     @models.permalink
     def get_absolute_url(self):
