@@ -36,7 +36,7 @@ class Infolog(models.Model):
     subscribed = models.ManyToManyField(User, blank=True, related_name="subscriber")
     tags = models.ManyToManyField(InfologTag, blank=True)
     infolog_text_sha256 = models.CharField(max_length=64, unique=True)
-    replay_gameID = models.CharField(max_length=32, blank=True)
+    replay_gameID = models.CharField(max_length=32, blank=True, db_index=True)
 
     def __unicode__(self):
         return u"Infolog({}, {}, {})".format(self.pk, self.upload_date.strftime("%Y-%m-%d"), self.replay)
