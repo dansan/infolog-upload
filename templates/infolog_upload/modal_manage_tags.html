@@ -10,13 +10,13 @@ Please see srs_base.html for license information.
           <div class="modal-body">
               <h4>Current Tags</h4>
               <p>Click a tag to <em>remove</em> it from the infolog.</p>
-              <p>{% for tag in infolog.tags.all %}<a href="{% url "modal_manage_tags_rm" infolog.id tag.id %}">
+              <p>{% for tag in infolog.tags.all %}<a href="{% url "infolog_upload/modal_manage_tags_rm" infolog.id tag.id %}">
                   {{ tag.name }}</a> {% endfor %}</p>
               <p><br></p>
 
               <h4>Known Tags</h4>
               <p>Click a tag to <em>add</em> it to the infolog.</p>
-              {% for tag in all_tags %}<a href="{% url "modal_manage_tags_add" infolog.id tag.id %}">
+              {% for tag in all_tags %}<a href="{% url "infolog_upload/modal_manage_tags_add" infolog.id tag.id %}">
                   {{ tag.name }}</a> {% endfor %}
               <p><br></p>
 

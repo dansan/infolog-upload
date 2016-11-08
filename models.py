@@ -43,7 +43,7 @@ class Infolog(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return "infolog_upload.views.infolog_view", [self.id]
+        return "infolog_upload/show", [self.id]
 
     @property
     def comments_count(self):

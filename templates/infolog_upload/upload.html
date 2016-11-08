@@ -21,7 +21,7 @@ Please see srs_base.html for license information.
             <h3 class="panel-title">Replay upload</h3>
           </div>
           <div class="panel-body">
-            <p>If you wish to upload a replay (demofile, *.sdf) file, please follow <a href="{% url 'srs.upload_views.upload' %}">this link</a>.</p>
+            <p>If you wish to upload a replay (demofile, *.sdf) file, please follow <a href="{% url 'srs/upload' %}">this link</a>.</p>
           </div>
         </div>
       </div>
@@ -34,7 +34,7 @@ Please see srs_base.html for license information.
                 <b>{{ msg }}</b>
                 {% if status == 0 %}<br/>Link: <a href="{{ url }}">Infolog #{{ id }}</a>{% endif %}
                 {%  if saved_infolog and not saved_infolog.replay %}<br/><b>No replay</b> could be associated with the
-                    infolog. Please <a href="{% url "srs.upload_views.upload" %}">upload</a> one.{% endif %}
+                    infolog. Please <a href="{% url "srs/upload" %}">upload</a> one.{% endif %}
             </div>
         </div>
     </div>

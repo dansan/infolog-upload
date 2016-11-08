@@ -10,7 +10,7 @@ Please see srs_base.html for license information.
 
 {% block maincontent%}
 
-<p>To use this page, you must <a href="{% url "srs.views.login" %}?next={{ selfurl }}">login</a> as a developer or as
+<p>To use this page, you must <a href="{% url "srs/login" %}?next={{ selfurl }}">login</a> as a developer or as
     user {{ replay.uploader }}.</p>
 
 {% endblock %}

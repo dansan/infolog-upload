@@ -40,7 +40,7 @@ Please see srs_base.html for license information.
   {% else %}
                 <p style="font-size: larger; font-weight: bold;">No replay available :(</p>
                 <hr style="margin-top: 7px; margin-bottom: 7px;">
-                <p style="margin: 0 0 2px;">Please ask the user to <a href="{% url "srs.upload_views.upload" %}">upload</a> the corresponding demofile.</p>
+                <p style="margin: 0 0 2px;">Please ask the user to <a href="{% url "srs/upload" %}">upload</a> the corresponding demofile.</p>
   {% endif %}
               </div>
             </div>
@@ -51,7 +51,7 @@ Please see srs_base.html for license information.
                 <p style="font-size: larger; font-weight: bold;">Infolog #{{ infolog.id }}</p>
                 <hr style="margin-top: 7px; margin-bottom: 7px;">
                 <p style="margin: 0 0 2px;">Upload date: {{ infolog.upload_date|date:"d.m.Y H:i:s (T)" }}</p>
-                <p style="margin: 0 0 2px;">Uploader: <a href="{% url 'srs.views.player' user.userprofile.accountid %}">{{ infolog.uploader }}</a></p>
+                <p style="margin: 0 0 2px;">Uploader: <a href="{% url 'srs/player' user.userprofile.accountid %}">{{ infolog.uploader }}</a></p>
                 <p style="margin: 0 0 2px;">Client software: {{ infolog.client }}</p>
                 <p style="margin: 0 0 2px;">External link: {% if infolog.ext_link %}<a href="{{ infolog.ext_link }}">{{ infolog.ext_link }}</a>{% else %}None{% endif %}</p>
                 {% if user.is_staff %}<p class="text-success"><a href="{% url 'admin:infolog_upload_infolog_change' infolog.pk %}">infolog @admin site</a></p>{% endif %}
@@ -69,7 +69,7 @@ Please see srs_base.html for license information.
                 {% endif %}
                 <p>Tags: {% for tag in infolog.tags.all %}{{ tag.name }}, {% endfor %}
                     <button class="btn btn-default btn-xs pull-right" data-toggle="modal" data-target="#tagModal"
-                            href="{% url "modal_manage_tags" infolog.id %}" title="Add or remove a tag">
+                            href="{% url "infolog_upload/modal_manage_tags" infolog.id %}" title="Add or remove a tag">
                         <span class="ionicons ion-pricetags"></span> Manage tags
                     </button>
                 </p>
@@ -121,4 +121,5 @@ Please see srs_base.html for license information.
 {% endblock %}
 
 {% block page_js %}
+    {% js "js/dyn/srs_post_comment.js" %}
 {% endblock %}

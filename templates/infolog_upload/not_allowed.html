@@ -9,7 +9,7 @@ Please see srs_base.html for license information.
 {% block pagetitle %}Not allowed{% endblock %}
 
 {% block maincontent%}
-<p>To see this page you must <a href="{% url "srs.views.login" %}">login</a> as {% if uploader != "_none_" %}the
+<p>To see this page you must <a href="{% url "srs/login" %}">login</a> as {% if uploader != "_none_" %}the
     uploader ({{ uploader }}) or as {% endif %}a developer. Contact dansan via PM in the SpringRTS forums if you
     don't know what to do.</p>
 {% endblock %}
