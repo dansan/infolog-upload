@@ -10,7 +10,7 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist
 from infolog_upload.models import Infolog
 
-logger = logging.getLogger("srs.infolog")
+logger = logging.getLogger(__name__)
 
 
 class Notifications(object):

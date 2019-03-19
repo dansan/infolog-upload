@@ -13,7 +13,7 @@ from infolog_upload.models import Infolog, InfologTag
 
 import logging
 
-logger = logging.getLogger("srs.infolog")
+logger = logging.getLogger(__name__)
 
 
 class InfologUploadForm(forms.Form):

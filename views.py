@@ -26,7 +26,7 @@ from infolog_upload.models import Infolog, InfologTag
 from forms import InfologUploadForm, NewTagForm
 from analyze_thread import AnalyzeThread
 
-logger = logging.getLogger("srs.infolog")
+logger = logging.getLogger(__name__)
 
 
 @login_required

@@ -19,7 +19,7 @@ from infolog_upload.analyzer import InfologAnalyzerError
 from infolog_upload.analyzer1 import InfologAnalyzer1
 
 
-logger = logging.getLogger("srs.infolog")
+logger = logging.getLogger(__name__)
 _il = logging.FileHandler(settings.LOG_PATH + '/analyse.log')
 _il.setLevel(logging.DEBUG)
 _il.setFormatter(logging.Formatter(fmt=settings.DEBUG_FORMAT, datefmt=settings.LOG_DATETIME_FORMAT))
