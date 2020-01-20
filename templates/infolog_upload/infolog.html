@@ -10,7 +10,7 @@ Please see srs_base.html for license information.
 {% endcomment %}
 
 {% block page_css %}
-    {% css "css/libs/ionicons.min.css" %}
+    <link rel="stylesheet" href="{% static "css/libs/ionicons.min.css" %}">
 {% endblock %}
 
 {% block pagetitle %}Infolog #{{ infolog.id }}{% endblock %}
@@ -121,5 +121,5 @@ Please see srs_base.html for license information.
 {% endblock %}
 
 {% block page_js %}
-    {% js "js/dyn/srs_post_comment.js" %}
+    <script src="{% static "js/dyn/srs_post_comment.js" %}"></script>
 {% endblock %}

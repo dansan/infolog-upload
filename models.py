@@ -1,13 +1,15 @@
 # This file is part of the "infolog-upload" program. It is published
 # under the GPLv3.
 #
-# Copyright (C) 2016 Daniel Troeder (daniel #at# admin-box #dot# com)
+# Copyright (C) 2016-2020 Daniel Troeder (daniel #at# admin-box #dot# com)
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.deletion import CASCADE
+from django.urls import reverse
 from django_comments.models import Comment
 
 
@@ -25,13 +27,13 @@ class Infolog(models.Model):
 
     infolog_text = models.TextField()
     free_text = models.TextField(blank=True)
-    replay = models.ForeignKey("srs.Replay", blank=True, null=True)
-    uploader = models.ForeignKey(User, related_name="infolog_uploader")
+    replay = models.ForeignKey("srs.Replay", blank=True, null=True, on_delete=CASCADE)
+    uploader = models.ForeignKey(User, related_name="infolog_uploader", on_delete=CASCADE)
     upload_date = models.DateTimeField(auto_now_add=True, db_index=True)
     client = models.CharField(max_length=256)
     has_support_ticket = models.BooleanField(default=False)
     severity = models.CharField(max_length=32, choices=SEVERITY_CHOICES, default="Normal", blank=True)
-    game = models.ForeignKey("srs.Game", blank=True, null=True)
+    game = models.ForeignKey("srs.Game", blank=True, null=True, on_delete=CASCADE)
     ext_link = models.URLField(blank=True)
     subscribed = models.ManyToManyField(User, blank=True, related_name="subscriber")
     tags = models.ManyToManyField(InfologTag, blank=True)
@@ -41,9 +43,8 @@ class Infolog(models.Model):
     def __unicode__(self):
         return u"Infolog({}, {}, {})".format(self.pk, self.upload_date.strftime("%Y-%m-%d"), self.replay)
 
-    @models.permalink
     def get_absolute_url(self):
-        return "infolog_upload/show", [self.id]
+        return reverse("infolog_upload/show", args=[self.id])
 
     @property
     def comments_count(self):
