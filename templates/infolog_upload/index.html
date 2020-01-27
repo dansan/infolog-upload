@@ -1,4 +1,5 @@
 {% extends 'srs_base.html' %}
+{% load static %}
 {% load eztables %}
 
 {% comment %}
@@ -8,7 +9,7 @@ Please see srs_base.html for license information.
 {% endcomment %}
 
 {% block page_css %}
-    {% css "css/libs/ionicons.min.css" %}
+    <link rel="stylesheet" href="{% static "css/libs/ionicons.min.css" %}">
 {% endblock %}
 
 

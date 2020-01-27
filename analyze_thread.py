@@ -1,7 +1,7 @@
 # This file is part of the "infolog-upload" program. It is published
 # under the GPLv3.
 #
-# Copyright (C) 2016 Daniel Troeder (daniel #at# admin-box #dot# com)
+# Copyright (C) 2016-2020 Daniel Troeder (daniel #at# admin-box #dot# com)
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -11,7 +11,6 @@ import threading
 import datetime
 
 from django.contrib.auth.models import User
-from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
 from infolog_upload.models import Infolog, InfologTag
@@ -20,10 +19,6 @@ from infolog_upload.analyzer1 import InfologAnalyzer1
 
 
 logger = logging.getLogger(__name__)
-_il = logging.FileHandler(settings.LOG_PATH + '/analyse.log')
-_il.setLevel(logging.DEBUG)
-_il.setFormatter(logging.Formatter(fmt=settings.DEBUG_FORMAT, datefmt=settings.LOG_DATETIME_FORMAT))
-logger.addHandler(_il)
 
 
 class AnalyzeThread(threading.Thread):

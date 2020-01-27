@@ -1,7 +1,7 @@
 # This file is part of the "infolog-upload" program. It is published
 # under the GPLv3.
 #
-# Copyright (C) 2016 Daniel Troeder (daniel #at# admin-box #dot# com)
+# Copyright (C) 2016-2020 Daniel Troeder (daniel #at# admin-box #dot# com)
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -15,7 +15,7 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.views.decorators.cache import never_cache
 
 from jsonrpc import jsonrpc_method
@@ -23,8 +23,8 @@ from jsonrpc import jsonrpc_method
 from srs.common import all_page_infos
 from srs.models import Replay
 from infolog_upload.models import Infolog, InfologTag
-from forms import InfologUploadForm, NewTagForm
-from analyze_thread import AnalyzeThread
+from .forms import InfologUploadForm, NewTagForm
+from .analyze_thread import AnalyzeThread
 
 logger = logging.getLogger(__name__)
 
@@ -82,14 +82,14 @@ def upload_json(request, infolog, client, freetext, has_support_ticket, extensio
     try:
         infolog_dec = base64.b64decode(infolog)
         logger.debug("infolog_dec:[30]: %s", infolog_dec[:50])
-    except TypeError, te:
+    except TypeError as te:
         logger.error("Uploaded infolog not properly formatted: %s", te)
         return {"status": 1, "msg": "Uploaded infolog not properly formatted."}
 
     try:
         freetext_dec = base64.b64decode(freetext)
         logger.debug("freetext_dec:[30]: %s", freetext_dec[:50])
-    except TypeError, te:
+    except TypeError as te:
         logger.error("Uploaded freetext not properly formatted: %s", te)
         return {"status": 2, "msg": "Uploaded freetext not properly formatted."}
 
@@ -193,7 +193,7 @@ def upload_html(request):
                     severity = form.cleaned_data['severity']
                     il_text = infolog_file.read()
                     infolog_file.close()
-                    il_text2 = unicode(il_text, errors='replace')
+                    il_text2 = str(il_text, errors='replace')
                     out = _save_infolog(request.user, il_text2.strip(), "manual upload", free_text, has_support_ticket,
                                         {}, severity)
                     return HttpResponseRedirect(out["url"])
