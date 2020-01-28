@@ -27,7 +27,9 @@ class AnalyzeThread(threading.Thread):
         replay_dict = self.infolog.replay.to_dict() if self.infolog.replay else {}
         ila1 = InfologAnalyzer1(logger, il_dict, replay_dict)
         # more analyzers can be added here
-        self.analyzers = [ila1, ]
+        self.analyzers = [
+            ila1,
+        ]
         super(AnalyzeThread, self).__init__()
 
     def run(self):
@@ -60,5 +62,7 @@ class AnalyzeThread(threading.Thread):
             except:
                 logger.error("FIXME: to broad exception handling.")
                 logger.exception("Error in result of analyzer '%s'.", analyzer.name)
-        logger.info("All analyzers ran, thread finished after %d seconds.", (datetime.datetime.now() -
-                                                                             self.thread.start_time).seconds)
+        logger.info(
+            "All analyzers ran, thread finished after %d seconds.",
+            (datetime.datetime.now() - self.thread.start_time).seconds,
+        )

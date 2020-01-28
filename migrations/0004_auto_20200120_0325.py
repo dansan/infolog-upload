@@ -6,13 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('infolog_upload', '0003_auto_20161107_1139'),
+        ("infolog_upload", "0003_auto_20161107_1139"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='infolog',
-            name='severity',
-            field=models.CharField(blank=True, choices=[('Low', 'Low: No hurry.'), ('Normal', 'Normal (default): A developer should look at this.'), ('High', 'High: Game is unplayable!')], default='Normal', max_length=32),
+            model_name="infolog",
+            name="severity",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("Low", "Low: No hurry."),
+                    ("Normal", "Normal (default): A developer should look at this."),
+                    ("High", "High: Game is unplayable!"),
+                ],
+                default="Normal",
+                max_length=32,
+            ),
         ),
     ]

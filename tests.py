@@ -19,7 +19,14 @@ class TestInfologUpload(test.TestCase):
 
     def test_authenticate_with_InfologUpload_success(self):
         sp = ServiceProxy(test_url)
-        out = sp.upload(lobby_username, lobby_password, "infolog text blah blah", "client name", "some free text",
-                        False, {})
+        out = sp.upload(
+            lobby_username,
+            lobby_password,
+            "infolog text blah blah",
+            "client name",
+            "some free text",
+            False,
+            {},
+        )
         self.assertIsNone(out["error"])
         self.assertEqual(out["result"]["status"], 0)

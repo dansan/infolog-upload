@@ -19,16 +19,25 @@ logger = logging.getLogger(__name__)
 class InfologUploadForm(forms.Form):
     infolog_file = forms.FileField(label="infolog.txt")
     free_text = forms.CharField(label="Description", widget=forms.Textarea)
-    has_support_ticket = forms.BooleanField(widget=forms.CheckboxInput(attrs={"class": "checkbox"}), required=False,
-                                            initial="False", label="This is a support ticket:")
-    severity = forms.ChoiceField(required=False, choices=Infolog.SEVERITY_CHOICES,
-                                 widget=forms.Select(attrs={"style": "color: #000000"}))
+    has_support_ticket = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={"class": "checkbox"}),
+        required=False,
+        initial="False",
+        label="This is a support ticket:",
+    )
+    severity = forms.ChoiceField(
+        required=False,
+        choices=Infolog.SEVERITY_CHOICES,
+        widget=forms.Select(attrs={"style": "color: #000000"}),
+    )
 
 
 class NewTagForm(ModelForm):
     class Meta:
         model = InfologTag
-        fields = ('name',)
+        fields = ("name",)
         widgets = {
-            'name': forms.TextInput(attrs={"class": "form-control input-sm", "placeholder": "New Tag"}),
+            "name": forms.TextInput(
+                attrs={"class": "form-control input-sm", "placeholder": "New Tag"}
+            ),
         }

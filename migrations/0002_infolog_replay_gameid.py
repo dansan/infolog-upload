@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('infolog_upload', '0001_initial'),
+        ("infolog_upload", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='infolog',
-            name='replay_gameID',
+            model_name="infolog",
+            name="replay_gameID",
             field=models.CharField(blank=True, max_length=32),
         ),
     ]

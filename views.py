@@ -36,16 +36,20 @@ def index(request):
     if user.userprofile.is_developer:
         c["infologs"] = Infolog.objects.all()
         c["subscribed_infologs"] = Infolog.objects.filter(subscribed=user)
-        return render(request, 'infolog_upload/index.html', c)
+        return render(request, "infolog_upload/index.html", c)
     elif user.infolog_uploader.exists():
         c["infologs"] = Infolog.objects.filter(uploader=user)
         c["subscribed_infologs"] = Infolog.objects.filter(subscribed=user)
-        return render(request, 'infolog_upload/index.html', c)
+        return render(request, "infolog_upload/index.html", c)
     else:
         return HttpResponseRedirect(reverse(not_allowed, args=["_none_"]))
 
 
-@jsonrpc_method('upload_json(String, String, String, Boolean, dict) -> dict', validate=True, authenticated=True)
+@jsonrpc_method(
+    "upload_json(String, String, String, Boolean, dict) -> dict",
+    validate=True,
+    authenticated=True,
+)
 def upload_json(request, infolog, client, freetext, has_support_ticket, extensions):
     """
     JSON-RPC upload function.
@@ -71,10 +75,18 @@ def upload_json(request, infolog, client, freetext, has_support_ticket, extensio
     status=0 and a user message.
     :rtype: dict
     """
-    logger.info("Received upload from HTTP_USER_AGENT: '%s', REMOTE_ADDR: '%s'", request.META.get("HTTP_USER_AGENT"),
-                request.META.get("REMOTE_ADDR"))
+    logger.info(
+        "Received upload from HTTP_USER_AGENT: '%s', REMOTE_ADDR: '%s'",
+        request.META.get("HTTP_USER_AGENT"),
+        request.META.get("REMOTE_ADDR"),
+    )
     logger.debug("infolog[:50]: '%s', freetext[:50]: '%s'", infolog[:50], freetext[:50])
-    logger.debug("client: '%s', has_support_ticket: '%s', extensions: '%s'", client, has_support_ticket, extensions)
+    logger.debug(
+        "client: '%s', has_support_ticket: '%s', extensions: '%s'",
+        client,
+        has_support_ticket,
+        extensions,
+    )
 
     user = request.user
     logger.debug("user: '%s'", user)
@@ -93,25 +105,50 @@ def upload_json(request, infolog, client, freetext, has_support_ticket, extensio
         logger.error("Uploaded freetext not properly formatted: %s", te)
         return {"status": 2, "msg": "Uploaded freetext not properly formatted."}
 
-    return _save_infolog(user, infolog_dec.strip(), client, freetext_dec.strip(), has_support_ticket,
-                         extensions=extensions)
+    return _save_infolog(
+        user,
+        infolog_dec.strip(),
+        client,
+        freetext_dec.strip(),
+        has_support_ticket,
+        extensions=extensions,
+    )
 
 
-def _save_infolog(user, infolog, client, free_text, has_support_ticket, extensions, severity="Normal"):
+def _save_infolog(
+    user, infolog, client, free_text, has_support_ticket, extensions, severity="Normal"
+):
     # logger.debug("user: %s, infolog: %s, client: %s, free_text: %s, has_support_ticket: %s, extensions: %s, "
     #              "severity: %s", user, infolog, client, free_text, has_support_ticket, extensions, severity)
 
-    logger.debug("user: %s, client: %s, has_support_ticket: %s, extensions: %s, severity: %s", user, client,
-                 has_support_ticket, extensions, severity)
+    logger.debug(
+        "user: %s, client: %s, has_support_ticket: %s, extensions: %s, severity: %s",
+        user,
+        client,
+        has_support_ticket,
+        extensions,
+        severity,
+    )
     logger.debug("free_text: '%s'", free_text)
-    logger.debug("infolog(%s, len: %d): '%s' ... '%s'", type(infolog), len(infolog), infolog[:30], infolog[-30:])
+    logger.debug(
+        "infolog(%s, len: %d): '%s' ... '%s'",
+        type(infolog),
+        len(infolog),
+        infolog[:30],
+        infolog[-30:],
+    )
 
     sha256 = hashlib.sha256(base64.b64encode(infolog.encode("utf-8"))).hexdigest()
     # not using get_or_create() to save comparison of infolog_text
     try:
         il = Infolog.objects.get(infolog_text_sha256=sha256)
     except ObjectDoesNotExist:
-        il = Infolog.objects.create(infolog_text_sha256=sha256, infolog_text=infolog, uploader=user, client=client)
+        il = Infolog.objects.create(
+            infolog_text_sha256=sha256,
+            infolog_text=infolog,
+            uploader=user,
+            client=client,
+        )
 
     il.free_text = free_text
     il.uploader = user
@@ -130,7 +167,12 @@ def _save_infolog(user, infolog, client, free_text, has_support_ticket, extensio
 
     AnalyzeThread(il).start()
 
-    return {"status": 0, "id": int(il.id), "msg": "Success.", "url": il.get_absolute_url()}
+    return {
+        "status": 0,
+        "id": int(il.id),
+        "msg": "Success.",
+        "url": il.get_absolute_url(),
+    }
 
 
 @login_required
@@ -143,12 +185,12 @@ def infolog_view(request, infologid):
     c["replay"] = infolog.replay
     user = request.user
 
-    if request.method == 'POST':
+    if request.method == "POST":
         # dev wants to subscribe to infolog changes
         infolog.subscribed.add(user)
 
     if user == infolog.uploader or user.userprofile.is_developer:
-        return render(request, 'infolog_upload/infolog.html', c)
+        return render(request, "infolog_upload/infolog.html", c)
     else:
         return HttpResponseRedirect(reverse(not_allowed, args=[infolog.uploader]))
 
@@ -156,7 +198,7 @@ def infolog_view(request, infologid):
 def not_allowed(request, uploader):
     c = all_page_infos(request)
     c["uploader"] = uploader
-    return render(request, 'infolog_upload/not_allowed.html', c)
+    return render(request, "infolog_upload/not_allowed.html", c)
 
 
 def _basic_parse(infolog):
@@ -172,7 +214,9 @@ def _basic_parse(infolog):
             logger.info("Infologs replay is %s.", out["replay"])
             out["game"] = out["replay"].game
         except ObjectDoesNotExist:
-            logger.info("Did not find replay with gameID %r for uploaded infolog.", gameid)
+            logger.info(
+                "Did not find replay with gameID %r for uploaded infolog.", gameid
+            )
     else:
         logger.error("Could not find gameID in uploaded infolog!")
     return out
@@ -181,29 +225,36 @@ def _basic_parse(infolog):
 @login_required
 def upload_html(request):
     c = all_page_infos(request)
-    if request.method == 'POST':
+    if request.method == "POST":
         form = InfologUploadForm(request.POST, request.FILES)
         if form.is_valid():
             if form.cleaned_data:
                 logger.debug("form.cleaned_data=%r", form.cleaned_data)
-                infolog_file = request.FILES['infolog_file']
+                infolog_file = request.FILES["infolog_file"]
                 if infolog_file.content_type == "text/plain":
-                    free_text = form.cleaned_data['free_text']
-                    has_support_ticket = form.cleaned_data['has_support_ticket']
-                    severity = form.cleaned_data['severity']
+                    free_text = form.cleaned_data["free_text"]
+                    has_support_ticket = form.cleaned_data["has_support_ticket"]
+                    severity = form.cleaned_data["severity"]
                     il_text = infolog_file.read()
                     infolog_file.close()
-                    il_text2 = str(il_text, errors='replace')
-                    out = _save_infolog(request.user, il_text2.strip(), "manual upload", free_text, has_support_ticket,
-                                        {}, severity)
+                    il_text2 = str(il_text, errors="replace")
+                    out = _save_infolog(
+                        request.user,
+                        il_text2.strip(),
+                        "manual upload",
+                        free_text,
+                        has_support_ticket,
+                        {},
+                        severity,
+                    )
                     return HttpResponseRedirect(out["url"])
                 else:
                     c["status"] = 4
                     c["msg"] = "Not a infolog.txt file."
     else:
         form = InfologUploadForm()
-    c['form'] = form
-    return render(request, 'infolog_upload/upload.html', c)
+    c["form"] = form
+    return render(request, "infolog_upload/upload.html", c)
 
 
 @login_required
@@ -215,7 +266,7 @@ def modal_manage_tags(request, infologid):
         return HttpResponseRedirect(reverse(not_allowed, args=[infolog.uploader]))
 
     c = all_page_infos(request)
-    if request.method == 'POST':
+    if request.method == "POST":
         form = NewTagForm(request.POST)
         if form.is_valid():
             if form.cleaned_data:
@@ -223,22 +274,28 @@ def modal_manage_tags(request, infologid):
                 if name:
                     ilt, _ = InfologTag.objects.get_or_create(name=name.strip())
                     infolog.tags.add(ilt)
-                    return HttpResponseRedirect(reverse(infolog_view, args=[infolog.id]))
+                    return HttpResponseRedirect(
+                        reverse(infolog_view, args=[infolog.id])
+                    )
         else:
             if form.instance and isinstance(form.instance, InfologTag):
                 # error was 'Infolog tag with this Name already exists.'. Ignored.
                 try:
                     ilt = InfologTag.objects.get(name=form.instance.name)
                     infolog.tags.add(ilt)
-                    return HttpResponseRedirect(reverse(infolog_view, args=[infolog.id]))
+                    return HttpResponseRedirect(
+                        reverse(infolog_view, args=[infolog.id])
+                    )
                 except:
                     pass
     else:
         form = NewTagForm()
     c["infolog"] = infolog
-    c["all_tags"] = InfologTag.objects.exclude(id__in=infolog.tags.values_list("id", flat=True))
+    c["all_tags"] = InfologTag.objects.exclude(
+        id__in=infolog.tags.values_list("id", flat=True)
+    )
     c["newtagform"] = form
-    return render(request, 'infolog_upload/modal_manage_tags.html', c)
+    return render(request, "infolog_upload/modal_manage_tags.html", c)
 
 
 @login_required

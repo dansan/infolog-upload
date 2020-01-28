@@ -13,42 +13,100 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('srs', '0001_initial'),
+        ("srs", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Infolog',
+            name="Infolog",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('infolog_text', models.TextField()),
-                ('free_text', models.TextField(blank=True)),
-                ('upload_date', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('client', models.CharField(max_length=256)),
-                ('has_support_ticket', models.BooleanField(default=False)),
-                ('severity', models.CharField(blank=True, choices=[(b'Low', b'Low: No hurry.'), (b'Normal', b'Normal (default): A developer should look at this.'), (b'High', b'High: Game is unplayable!')], default=b'Normal', max_length=32)),
-                ('ext_link', models.URLField(blank=True)),
-                ('infolog_text_sha256', models.CharField(max_length=64, unique=True)),
-                ('game', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='srs.Game')),
-                ('replay', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='srs.Replay')),
-                ('subscribed', models.ManyToManyField(blank=True, related_name='subscriber', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("infolog_text", models.TextField()),
+                ("free_text", models.TextField(blank=True)),
+                ("upload_date", models.DateTimeField(auto_now_add=True, db_index=True)),
+                ("client", models.CharField(max_length=256)),
+                ("has_support_ticket", models.BooleanField(default=False)),
+                (
+                    "severity",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            (b"Low", b"Low: No hurry."),
+                            (
+                                b"Normal",
+                                b"Normal (default): A developer should look at this.",
+                            ),
+                            (b"High", b"High: Game is unplayable!"),
+                        ],
+                        default=b"Normal",
+                        max_length=32,
+                    ),
+                ),
+                ("ext_link", models.URLField(blank=True)),
+                ("infolog_text_sha256", models.CharField(max_length=64, unique=True)),
+                (
+                    "game",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="srs.Game",
+                    ),
+                ),
+                (
+                    "replay",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="srs.Replay",
+                    ),
+                ),
+                (
+                    "subscribed",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="subscriber",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='InfologTag',
+            name="InfologTag",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(db_index=True, max_length=128, unique=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(db_index=True, max_length=128, unique=True)),
             ],
         ),
         migrations.AddField(
-            model_name='infolog',
-            name='tags',
-            field=models.ManyToManyField(blank=True, to='infolog_upload.InfologTag'),
+            model_name="infolog",
+            name="tags",
+            field=models.ManyToManyField(blank=True, to="infolog_upload.InfologTag"),
         ),
         migrations.AddField(
-            model_name='infolog',
-            name='uploader',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='infolog_uploader', to=settings.AUTH_USER_MODEL),
+            model_name="infolog",
+            name="uploader",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="infolog_uploader",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]
