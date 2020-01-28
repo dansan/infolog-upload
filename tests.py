@@ -9,7 +9,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django import test
-
 from jsonrpc.proxy import ServiceProxy
 
 from .test_logins import *

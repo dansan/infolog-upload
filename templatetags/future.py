@@ -6,4 +6,3 @@ register = Library()
 @register.tag
 def url(*args, **kwargs):
     return url_ori(*args, **kwargs)
-

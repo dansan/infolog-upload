@@ -7,8 +7,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+
 from django.core.exceptions import ObjectDoesNotExist
-from infolog_upload.models import Infolog
+
+from .models import Infolog
 
 logger = logging.getLogger(__name__)
 

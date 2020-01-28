@@ -7,7 +7,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from infolog_upload.analyzer import InfologAnalyzer
+from .analyzer import InfologAnalyzer
 
 
 class InfologAnalyzer1(InfologAnalyzer):

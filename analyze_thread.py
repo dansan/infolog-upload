@@ -6,17 +6,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime
 import logging
 import threading
-import datetime
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 
-from infolog_upload.models import Infolog, InfologTag
-from infolog_upload.analyzer import InfologAnalyzerError
-from infolog_upload.analyzer1 import InfologAnalyzer1
-
+from .analyzer import InfologAnalyzerError
+from .analyzer1 import InfologAnalyzer1
+from .models import Infolog, InfologTag
 
 logger = logging.getLogger(__name__)
 

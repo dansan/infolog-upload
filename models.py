@@ -6,8 +6,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 from django.db.models.deletion import CASCADE
 from django.urls import reverse
 from django_comments.models import Comment

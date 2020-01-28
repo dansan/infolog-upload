@@ -6,25 +6,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import base64
-import re
 import hashlib
+import logging
+import re
 
-from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.cache import never_cache
-
 from jsonrpc import jsonrpc_method
 
 from srs.common import all_page_infos
 from srs.models import Replay
-from infolog_upload.models import Infolog, InfologTag
-from .forms import InfologUploadForm, NewTagForm
+
 from .analyze_thread import AnalyzeThread
+from .forms import InfologUploadForm, NewTagForm
+from .models import Infolog, InfologTag
 
 logger = logging.getLogger(__name__)
 
