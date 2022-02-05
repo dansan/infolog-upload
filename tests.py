@@ -11,7 +11,7 @@
 from django import test
 from jsonrpc.proxy import ServiceProxy
 
-from .test_logins import *
+from .test_logins import lobby_password, lobby_username, test_url
 
 
 class TestInfologUpload(test.TestCase):
