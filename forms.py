@@ -37,7 +37,5 @@ class NewTagForm(ModelForm):
         model = InfologTag
         fields = ("name",)
         widgets = {
-            "name": forms.TextInput(
-                attrs={"class": "form-control input-sm", "placeholder": "New Tag"}
-            ),
+            "name": forms.TextInput(attrs={"class": "form-control input-sm", "placeholder": "New Tag"}),
         }

@@ -115,9 +115,7 @@ def upload_json(request, infolog, client, freetext, has_support_ticket, extensio
     )
 
 
-def _save_infolog(
-    user, infolog, client, free_text, has_support_ticket, extensions, severity="Normal"
-):
+def _save_infolog(user, infolog, client, free_text, has_support_ticket, extensions, severity="Normal"):
     # logger.debug("user: %s, infolog: %s, client: %s, free_text: %s, has_support_ticket: %s, extensions: %s, "
     #              "severity: %s", user, infolog, client, free_text, has_support_ticket, extensions, severity)
 
@@ -214,9 +212,7 @@ def _basic_parse(infolog):
             logger.info("Infologs replay is %s.", out["replay"])
             out["game"] = out["replay"].game
         except ObjectDoesNotExist:
-            logger.info(
-                "Did not find replay with gameID %r for uploaded infolog.", gameid
-            )
+            logger.info("Did not find replay with gameID %r for uploaded infolog.", gameid)
     else:
         logger.error("Could not find gameID in uploaded infolog!")
     return out
@@ -274,26 +270,20 @@ def modal_manage_tags(request, infologid):
                 if name:
                     ilt, _ = InfologTag.objects.get_or_create(name=name.strip())
                     infolog.tags.add(ilt)
-                    return HttpResponseRedirect(
-                        reverse(infolog_view, args=[infolog.id])
-                    )
+                    return HttpResponseRedirect(reverse(infolog_view, args=[infolog.id]))
         else:
             if form.instance and isinstance(form.instance, InfologTag):
                 # error was 'Infolog tag with this Name already exists.'. Ignored.
                 try:
                     ilt = InfologTag.objects.get(name=form.instance.name)
                     infolog.tags.add(ilt)
-                    return HttpResponseRedirect(
-                        reverse(infolog_view, args=[infolog.id])
-                    )
+                    return HttpResponseRedirect(reverse(infolog_view, args=[infolog.id]))
                 except:
                     pass
     else:
         form = NewTagForm()
     c["infolog"] = infolog
-    c["all_tags"] = InfologTag.objects.exclude(
-        id__in=infolog.tags.values_list("id", flat=True)
-    )
+    c["all_tags"] = InfologTag.objects.exclude(id__in=infolog.tags.values_list("id", flat=True))
     c["newtagform"] = form
     return render(request, "infolog_upload/modal_manage_tags.html", c)
 

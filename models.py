@@ -30,15 +30,11 @@ class Infolog(models.Model):
     infolog_text = models.TextField()
     free_text = models.TextField(blank=True)
     replay = models.ForeignKey("srs.Replay", blank=True, null=True, on_delete=CASCADE)
-    uploader = models.ForeignKey(
-        User, related_name="infolog_uploader", on_delete=CASCADE
-    )
+    uploader = models.ForeignKey(User, related_name="infolog_uploader", on_delete=CASCADE)
     upload_date = models.DateTimeField(auto_now_add=True, db_index=True)
     client = models.CharField(max_length=256)
     has_support_ticket = models.BooleanField(default=False)
-    severity = models.CharField(
-        max_length=32, choices=SEVERITY_CHOICES, default="Normal", blank=True
-    )
+    severity = models.CharField(max_length=32, choices=SEVERITY_CHOICES, default="Normal", blank=True)
     game = models.ForeignKey("srs.Game", blank=True, null=True, on_delete=CASCADE)
     ext_link = models.URLField(blank=True)
     subscribed = models.ManyToManyField(User, blank=True, related_name="subscriber")
@@ -47,9 +43,7 @@ class Infolog(models.Model):
     replay_gameID = models.CharField(max_length=32, blank=True, db_index=True)
 
     def __unicode__(self):
-        return "Infolog({}, {}, {})".format(
-            self.pk, self.upload_date.strftime("%Y-%m-%d"), self.replay
-        )
+        return "Infolog({}, {}, {})".format(self.pk, self.upload_date.strftime("%Y-%m-%d"), self.replay)
 
     def get_absolute_url(self):
         return reverse("infolog_upload/show", args=[self.id])
@@ -78,9 +72,7 @@ class Infolog(models.Model):
             "severity": self.severity,
             "game": self.game.name if self.game else "FIXME: no game",
             "game_id": self.game.id if self.game else 0,  # "FIXME: no game"
-            "game_devs": ",".join(
-                self.game.developer.all().values_list("username", flat=True)
-            )
+            "game_devs": ",".join(self.game.developer.all().values_list("username", flat=True))
             if self.game and self.game.developer.exists()
             else "",
             "ext_link": self.ext_link,
